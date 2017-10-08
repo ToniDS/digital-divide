@@ -29,9 +29,8 @@ def clean_nan(df):
     for var in list(df.columns[2:]):
         for country in list(df.country.unique()):
             time = min(set(list(df['date'])))
-            condition = np.nan(
-                    df[df['date']==time and df['country']==country][var])
-            while condition:
+            condition = df[(df['date']==time) & (df['country']==country)][var])
+            while condition.isnull():
                 df[df['date']==time and df['country']==country][var] = 0
                 time += 1
                 condition = np.nan(
