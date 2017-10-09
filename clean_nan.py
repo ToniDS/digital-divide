@@ -34,13 +34,11 @@ def clean_nan(midf, variables):
         for var in variables:
             time = min(years)
             condition = midf.loc[(time, country), var]
-            try: 
-                while np.isnan(condition) and time <= max(years):
-                    midf.loc[(time, country), var] = 0
-                    time += 1
-                    condition = midf.loc[(time, country), var]
-            except: 
-                break
+            while np.isnan(condition) and time <= max(years):
+                midf.loc[(time, country), var] = 0
+                time += 1
+                condition = midf.loc[(time, country), var]
+    
             
             ###secondly, where possible, replace values with mean of preceding and following values
     for country in countries:

@@ -1,2 +1,6 @@
 #ignore data files
 *.csv
+
+#ignore econtools and python setup
+econtools
+__
