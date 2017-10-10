@@ -24,8 +24,8 @@ def clean_nan(midf, variables):
         
     
     #create sets that store the countries and years
-    countries = list(set([x for (y,x) in midf.index.values]))
-    years = list(set([y for (y,x) in midf.index.values]))
+    countries = list(set([x for (x,y) in midf.index.values]))
+    years = list(set([y for (x,y) in midf.index.values]))
     
     
     types = []
@@ -33,21 +33,22 @@ def clean_nan(midf, variables):
     for country in countries:
         for var in variables:
             time = min(years)
-            condition = midf.loc[(time, country), var]
+            condition = midf.loc[(country, time), var]
             while np.isnan(condition) and time <= max(years):
-                midf.loc[(time, country), var] = 0
-                time += 1
-                condition = midf.loc[(time, country), var]
+                midf.loc[(country, time), var] = 0
+                time = time + 1
+                condition = midf.loc[(country, time), var]
     
             
             ###secondly, where possible, replace values with mean of preceding and following values
     for country in countries:
         for var in variables:
             for time in years:
-                condition = midf.loc[(time, country), var]
+                condition = midf.loc[(country, time), var]
                 if np.isnan(condition) and (min(years) < time < max(years)):
-                    aver = (midf.loc[(time-1, country), var] + midf.loc[(time+1, country), var]) /2
-                    midf.loc[(time, country), var] = aver
+                    aver = (midf.loc[(country, time-1), var] + midf.loc[(
+                            country, time+1), var]) /2
+                    midf.loc[(country, time), var] = aver
                     
                 
     return midf
