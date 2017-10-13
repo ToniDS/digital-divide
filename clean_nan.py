@@ -12,7 +12,7 @@ Created on Sat Oct  7 12:09:16 2017
 import pandas as pd
 import numpy as np
 
-def clean_nan(midf, variables):
+def clean_leading_nan(midf, variables):
     '''This function takes in a multi-index dataframe with indices
     date and country and the variables I wish to check. 
     Vars need to have float values.
@@ -38,9 +38,22 @@ def clean_nan(midf, variables):
                 midf.loc[(country, time), var] = 0
                 time = time + 1
                 condition = midf.loc[(country, time), var]
+                    
+    return midf
+
+def impute_nan_mean(midf, variables):
+    '''This function takes in a multi-index dataframe with indices
+    country and date, and the variables I wish to impute the nans as a list-like. 
+    Vars need to have float values.
+    It returns a new dataframe that has nan-values in-between known values, 
+    imputed the mean of surrounding values: 
+        df[i, t] = mean(df[i, t-1], df[i, t+1]).'''
+        
+     #create sets that store the countries and years
+    countries = list(set([x for (x,y) in midf.index.values]))
+    years = list(set([y for (x,y) in midf.index.values]))
     
-            
-            ###secondly, where possible, replace values with mean of preceding and following values
+    ### where possible, replace values with mean of preceding and following values
     for country in countries:
         for var in variables:
             for time in years:
@@ -48,11 +61,9 @@ def clean_nan(midf, variables):
                 if np.isnan(condition) and (min(years) < time < max(years)):
                     aver = (midf.loc[(country, time-1), var] + midf.loc[(
                             country, time+1), var]) /2
-                    midf.loc[(country, time), var] = aver
-                    
-                
+                    midf.loc[(country, time), var] = aver 
     return midf
-
+ 
 
 def clean_all_na(df, key, var):
     """This function takes in a dataframe, a key i.e. column vector, by which to group
